@@ -296,7 +296,7 @@ namespace PracticaAPI.Steps
         {
             searchUser = new Dictionary<string, string>
             {
-                {"query","ABC"},
+                {"query","Valeronsss"},
                 {"partyType","USER"}
 
              };
@@ -321,7 +321,9 @@ namespace PracticaAPI.Steps
         {
             var temp = response.Content;
             JObject json = JObject.Parse(temp);
-            Assert.AreEqual("4", json["foundCount"].ToString());
+            Assert.AreEqual("1", json["foundCount"].ToString());
+            string userEmail = json["results"][0]["email"]?.ToString();
+            Assert.AreEqual("dmytro4556@i.ua", userEmail);
         }
 
     }

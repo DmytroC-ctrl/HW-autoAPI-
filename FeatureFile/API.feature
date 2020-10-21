@@ -48,8 +48,15 @@ Then the request response contains an type -success and id
 Scenario: Search my company
 Given data for company search is prepared
 When I am sending a request to search a company
-Then status code request ok
+Then status code request okey 
 Then the response to the request contains the type -success and has the required id
+
+Scenario: Search user
+Given data for user search is prepared
+When I am sending a request to search a user
+Then status code request okay
+Then the response to the request contains the type -success
+
 
 
 

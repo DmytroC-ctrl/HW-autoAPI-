@@ -20,6 +20,7 @@ namespace PracticaAPI.Steps
         Dictionary<string, object> dataCreatUser;
         Dictionary<string, string> taskData;
         Dictionary<string, string> searchCompany;
+        Dictionary<string, string> searchUser;
 
         [Given(@"creat new rest client")]
         public void GivenCreatNewRestClient()
@@ -182,14 +183,21 @@ namespace PracticaAPI.Steps
             userName = temp;
             email = "user" + temp + "@gmail.com";
 
-
+            List<Dictionary<string, string>> tasks = new List<Dictionary<string, string>>()
+            {
+                new Dictionary<string,string>()
+                {
+                    { "title","Первая задача" },
+                    { "description","Первая задача11" }
+                }
+            };
             dataCreatUser = new Dictionary<string, object>
             {
                 {"email", email },
                 {"name", userName },
-                {"tasks",  new List<string>{"title","Первая задача","description","Первая задача11" }
+                {"tasks", tasks }
 
-                } };
+                 };
         }
 
         [When(@"I send post new user with task is ready")]
@@ -242,7 +250,7 @@ namespace PracticaAPI.Steps
             var temp = response.Content;
             JObject json = JObject.Parse(temp);
             Assert.AreEqual("success", json["type"].ToString());
-            Assert.IsNotNull( json["id_task"].ToString());
+            Assert.IsNotNull(json["id_task"].ToString());
         }
         ///////////////////////////////////////////////////////////
         [Given(@"data for company search is prepared")]
@@ -250,9 +258,10 @@ namespace PracticaAPI.Steps
         {
             searchCompany = new Dictionary<string, string>
             {
-                {"query","ABC"},
-                {"type","company"}
-            };
+                {"query","ABCOnePOM"},
+                {"partyType","COMPANY"}
+
+             };
         }
 
         [When(@"I am sending a request to search a company")]
@@ -263,14 +272,56 @@ namespace PracticaAPI.Steps
             request.AddJsonBody(searchCompany);
             response = client.Execute(request);
         }
+        [Then(@"status code request okey")]
+        public void ThenStatusCodeRequestOkey()
+        {
+            Assert.AreEqual("233", response.StatusCode.ToString());
+        }
+
 
         [Then(@"the response to the request contains the type -success and has the required id")]
         public void ThenTheResponseToTheRequestContainsTheType_SuccessAndHasTheRequiredId()
         {
             var temp = response.Content;
+            JObject json = JObject.Parse(temp);      
+             Assert.AreEqual("1", json["foundCount"].ToString());
+            string name = json["results"][0]["name"]?.ToString();
+            Assert.AreEqual("ABCOnePOM", name);
+        }
+
+        //////////////////////////////////////////////////////////////
+
+        [Given(@"data for user search is prepared")]
+        public void GivenDataForUserSearchIsPrepared()
+        {
+            searchUser = new Dictionary<string, string>
+            {
+                {"query","ABC"},
+                {"partyType","USER"}
+
+             };
+        }
+        [When(@"I am sending a request to search a user")]
+        public void WhenIAmSendingARequestToSearchAUser()
+        {
+            RestRequest request = new RestRequest("tasks/rest/magicsearch", Method.POST);
+            request.RequestFormat = DataFormat.Json;
+            request.AddJsonBody(searchUser);
+            response = client.Execute(request);
+        }
+
+        [Then(@"status code request okay")]
+        public void ThenStatusCodeRequestOkay()
+        {
+            Assert.AreEqual("231", response.StatusCode.ToString());
+        }
+
+        [Then(@"the response to the request contains the type -success")]
+        public void ThenTheResponseToTheRequestContainsTheType_Success()
+        {
+            var temp = response.Content;
             JObject json = JObject.Parse(temp);
-            Assert.AreEqual("success", json["type"].ToString());
-            Assert.AreEqual("1093",json["id_company"].ToString());
+            Assert.AreEqual("4", json["foundCount"].ToString());
         }
 
     }
